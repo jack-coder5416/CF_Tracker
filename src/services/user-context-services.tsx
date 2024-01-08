@@ -1,31 +1,43 @@
 import React, { useState } from 'react'
-import axios from "axios";
-import { toast } from "react-toastify";
+import axios, { AxiosResponse } from "axios";
+import { ToastOptions, toast } from "react-toastify";
 
 const UserContext = React.createContext(
     {
        user:{},
-       setCurrentUser: ()=>{},
+       setCurrentUser: (e: any, handle: string) => {},
        rating:null,
        toggleRating: ()=>{},
     }
 );
 
+const toastOptions: ToastOptions<{}> = {
+  position: toast.POSITION.TOP_RIGHT,
+};
+
 export const UserContextProvider = (props:any) => {
     const [user,setUser]:any = useState({});
     const [rating,setRating]:any = useState({});
 
-    const setCurrentUser:any = async(e:any, handle:any) => {
-       e.preventDefault();
-       try{
-         const res = await axios.get(`https://codeforces.com/api/user.info?handles=${handle}`)
-         setUser(res.data.result[0]);
-         localStorage.setItem("user", JSON.stringify(res.data.result[0]));
-       }catch(err:any){
-        if (err.response.status === 400) {
-          toast.error(err.response.data.comment, toast.POSITION.TOP_RIGHT);
+    const setCurrentUser: (e:any, handle:any)=>{} = async (e: any, handle: any) => {
+      e.preventDefault();
+      try {
+        const res:AxiosResponse<any, any> = await axios.get(`https://codeforces.com/api/user.info?handles=${handle}`);
+        if(res.status===200 || res.status===201) {
+          setUser(res.data.result[0]);
+          localStorage.setItem("user", JSON.stringify(res.data.result[0]));
+          // console.log(localStorage.getItem("user"))
+          window.location.reload();
         }
-       }
+        
+      } catch (err: any) {
+        if (err.response.status === 400) {
+          toast.error(err.response.data.comment, {position:toast.POSITION.TOP_RIGHT});
+        }
+        else{
+          console.log(err);
+        }
+      }
     };
     const toggleRating:any = (e:any) => {
       e.preventDefault();

@@ -1,0 +1,91 @@
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+
+const Tags: React.FC<{
+  problemspractice: any;
+  onTagsChange: (selectedTags: string[], selectedProblems: any[]) => void;
+}> = ({ problemspractice, onTagsChange }) => {
+  const [checked, setChecked] = useState<string[]>([]);
+  const [problems, setProblems] = useState<any[]>([]);
+
+  const tags = [
+    "greedy",
+    "implementation",
+    "math",
+    "constructive algorithms",
+    "sortings",
+    "strings",
+    "brute force",
+    "data structures",
+    "number theory",
+    "dp",
+    "two pointers",
+    "combinatorics",
+    "binary search",
+    "geometry",
+    "dfs and similar",
+    "graphs",
+    "trees",
+    "games",
+    "bitmasks",
+  ];
+
+  const handleToggle = (value: string) => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+  };
+
+  useEffect(() => {
+    const getProblems = async () => {
+      let tagString = "";
+
+      for (let tag of checked) {
+        const modifiedTag = tag.replace(" ", "%20") + ";";
+        tagString += modifiedTag;
+      }
+
+      try {
+        const resProblems = await axios.get(
+          `https://codeforces.com/api/problemset.problems?tags=${tagString}`
+        );
+        setProblems(resProblems.data.result.problems);
+        onTagsChange(checked, resProblems.data.result.problems);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getProblems();
+  }, [onTagsChange]);
+
+  return (
+    <div className='flex flex-col px-2 py-1'>
+      <h5 className='font-[500] text-[20px]'>Tags</h5>
+      <div className='px-5 py-2'>
+        {tags.map((tag) => (
+          <div key={tag} className='flex items-center'>
+            <input
+              type='checkbox'
+              id={tag}
+              checked={checked.includes(tag)}
+              onClick={() => handleToggle(tag)}
+            />
+            <label htmlFor={tag} className='ml-2'>
+              {tag}
+            </label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Tags;
