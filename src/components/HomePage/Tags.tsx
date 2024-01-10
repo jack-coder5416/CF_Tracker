@@ -33,25 +33,21 @@ const Tags: React.FC<{
   const handleToggle = (value: string) => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
-
     if (currentIndex === -1) {
       newChecked.push(value);
     } else {
       newChecked.splice(currentIndex, 1);
     }
-
     setChecked(newChecked);
   };
 
   useEffect(() => {
     const getProblems = async () => {
       let tagString = "";
-
       for (let tag of checked) {
         const modifiedTag = tag.replace(" ", "%20") + ";";
         tagString += modifiedTag;
       }
-
       try {
         const resProblems = await axios.get(
           `https://codeforces.com/api/problemset.problems?tags=${tagString}`
@@ -62,9 +58,8 @@ const Tags: React.FC<{
         console.log(err);
       }
     };
-
     getProblems();
-  }, [onTagsChange]);
+  }, []);
 
   return (
     <div className='flex flex-col px-2 py-1'>
