@@ -1,19 +1,17 @@
 import React, { useState } from 'react'
 import axios, { AxiosResponse } from "axios";
-import { ToastOptions, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 const UserContext = React.createContext(
     {
        user:{},
-       setCurrentUser: (e: any, handle: string) => {},
+       setCurrentUser: (e: any, handle: string) => {[e,handle]},
        rating:null,
        toggleRating: ()=>{},
     }
 );
 
-const toastOptions: ToastOptions<{}> = {
-  position: toast.POSITION.TOP_RIGHT,
-};
+
 
 export const UserContextProvider = (props:any) => {
     const [user,setUser]:any = useState({});

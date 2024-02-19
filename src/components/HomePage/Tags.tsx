@@ -5,9 +5,8 @@ const Tags: React.FC<{
   problemspractice: any;
   setisloading:any;
   onTagsChange: (selectedTags: string[], selectedProblems: any[]) => void;
-}> = ({ problemspractice, onTagsChange, setisloading }) => {
+}> = ({ onTagsChange, setisloading }) => {
   const [checked, setChecked] = useState<string[]>([]);
-  const [problems, setProblems] = useState<any[]>([]);
 
   
   const tags = [
@@ -50,7 +49,7 @@ const Tags: React.FC<{
         const resProblems = await axios.get(
           `https://codeforces.com/api/problemset.problems?tags=${tagString}`
           );
-          setProblems(resProblems.data.result.problems);
+          
           onTagsChange(checked, resProblems.data.result.problems);
         } catch (err) {
           console.log(err);

@@ -34,7 +34,7 @@ const Home = () => {
   return (
     <div className="px-[10%] py-8 flex flex-row justify-between items-center gap-5 ">
       
-      <Problems problems={selectedProblems} currentPage={currentPage} setCurrentPage={setCurrentPage} isloading={isLoading} />
+      <Problems problems={selectedProblems} currentPage={currentPage} setCurrentPage={setCurrentPage} isloading={isLoading} selectedTags={selectedTags} />
       <div className="flex flex-col w-[40%] h-screen">
         {/* {Search Handle Component} */}
         <div className="ml-auto flex flex-row overflow-x-scroll whitespace-nowrap scrollbar-hide items-center border-[1px] border-[#333] px-2 py-1 rounded-2xl w-[60%] gap-2">
