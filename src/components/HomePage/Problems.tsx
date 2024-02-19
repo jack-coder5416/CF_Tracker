@@ -1,87 +1,55 @@
-// Problems.tsx
-import { useEffect, useState } from 'react';
+import './Problems.css';
 
-
-let worker: Worker | null = null;
-const Problems = () => {
-    const itemsPerPage = 20;
-
-    const [problems, setProblems] = useState<any[] | []>([]);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-
-
-
-    const fetchData = (page: number, forceRefresh: boolean = false) => {
-        setIsLoading(true);
-
-        if (!worker) return;
-        // Listen for messages from the Web Worker
-        worker.onmessage = (event) => {
-
-            console.log("Frontend Side", event);
-            const { data, fromCache, error } = event.data;
-
-            console.log("Application Side", data);
-
-            if (error) {
-                console.error(error);
-            } else {
-                setProblems(data);
-                console.log(fromCache ? 'Data from cache' : 'Data fetched from API');
-            }
-
-            setIsLoading(false);
-        };
-
-        // Start the Web Worker and pass data to it
-        worker.postMessage({ page, pageSize: itemsPerPage, forceRefresh });
+const Problems = ({ problems, currentPage, setCurrentPage, isloading }:any) => {
+    const problemsPerPage = 12;
+    const handleClick = (e: any, problem: any) => {
+        e.preventDefault();
+        window.open(
+            `https://codeforces.com/contest/${problem.contestId}/problem/${problem.index}`,
+            "_blank"
+        );
     };
 
-
-    useEffect(() => {
-        // Create a new Web Worker instance
-        worker = new Worker(new URL("./../../workers/problemsCache.ts", import.meta.url));
-
-        // Clean up the worker when the component unmounts
-      
-    }, []);
-
-
-    useEffect(() => {
-        fetchData(currentPage);
-    }, []);
-
-    const handlePageChange = (type: string) => {
-       setCurrentPage((prev) => type === "inc" ? prev + 1 : prev - 1);
-       fetchData(currentPage + 1);
-    };
+    // Logic to slice problems array based on current page
+    const startIndex = (currentPage - 1) * problemsPerPage;
+    const endIndex = startIndex + problemsPerPage;
+    const currentProblems = problems.slice(startIndex, endIndex);
 
     return (
         <div className="flex flex-col gap-2 w-[70%] h-[100%]">
-            <div className="grid grid-cols-3 gap-4 mt-4 h-[90%]">
-                {problems.map((problem, index) => (
-                    <div key={index} className="border border-[#4de6ba] shadow-md p-4 cursor-pointer hover:scale-[1.01]">
-                        <h3 className="text-lg font-semibold">{problem.name}</h3>
+            {isloading ? ( 
+                 <div className="loader-container">
+                    <div className="loader"></div>
+                 </div>
+            ) : (
+                <>
+                    <div className="grid grid-cols-3 gap-4 mt-4 h-[90%]">
+                        {currentProblems.map((problem:any, index:any) => (
+                            <div key={index} className="flex flex-col border border-[#4de6ba] shadow-md p-4 cursor-pointer hover:scale-[1.01] rounded-md" onClick={(e) => handleClick(e, problem)} >
+                                <h3 className="text-lg font-semibold" >{problem.name} </h3>
+                                <h3 className='w-fit rounded-[20px] px-2 py-1 text-[10px] bg-[#4de6ba]'>&#11088;{(problem.rating)?(problem.rating):('unrated')}</h3>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
-            <div className="flex justify-center mt-4">
-                <button
-                    className="px-4 py-2 mx-2 bg-blue-500 hover:bg-opacity-80 cursor-pointer text-white rounded-md"
-                    onClick={() => handlePageChange("dec")}
-                    disabled={currentPage === 1}
-                >
-                    Previous
-                </button>
-                <button
-                    className="px-4 py-2 mx-2 bg-blue-500 hover:bg-opacity-80 cursor-pointer text-white rounded-md"
-                    onClick={() => handlePageChange("inc")}
-                    disabled={problems.length < itemsPerPage}
-                >
-                    Next
-                </button>
-            </div>
+                    <div className="flex justify-center mt-4">
+                        <button
+                            className="px-4 py-2 mx-2 bg-[#4de6ba] hover:bg-opacity-80 cursor-pointer text-white rounded-md"
+                            onClick={() => setCurrentPage((prev:any) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </button>
+                        <div className='text-center px-4 py-2'>Page {currentPage}</div>
+                        <button
+                            className="px-8 py-2 mx-2 bg-[#4de6ba] hover:bg-opacity-80 cursor-pointer text-[#fff] rounded-md "
+                            onClick={() => setCurrentPage((prev:any) => prev + 1)}
+                            disabled={currentProblems.length < problemsPerPage}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

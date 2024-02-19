@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react';
 
 const Tags: React.FC<{
   problemspractice: any;
+  setisloading:any;
   onTagsChange: (selectedTags: string[], selectedProblems: any[]) => void;
-}> = ({ problemspractice, onTagsChange }) => {
+}> = ({ problemspractice, onTagsChange, setisloading }) => {
   const [checked, setChecked] = useState<string[]>([]);
   const [problems, setProblems] = useState<any[]>([]);
 
+  
   const tags = [
     "greedy",
     "implementation",
@@ -29,7 +31,7 @@ const Tags: React.FC<{
     "games",
     "bitmasks",
   ];
-
+  
   const handleToggle = (value: string) => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
@@ -40,30 +42,29 @@ const Tags: React.FC<{
     }
     setChecked(newChecked);
   };
-
+  
   useEffect(() => {
     const getProblems = async () => {
-      let tagString = "";
-      for (let tag of checked) {
-        const modifiedTag = tag.replace(" ", "%20") + ";";
-        tagString += modifiedTag;
-      }
+      let tagString = checked.join(';');
       try {
         const resProblems = await axios.get(
           `https://codeforces.com/api/problemset.problems?tags=${tagString}`
-        );
-        setProblems(resProblems.data.result.problems);
-        onTagsChange(checked, resProblems.data.result.problems);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getProblems();
-  }, []);
-
+          );
+          setProblems(resProblems.data.result.problems);
+          onTagsChange(checked, resProblems.data.result.problems);
+        } catch (err) {
+          console.log(err);
+        }
+        finally {
+          setisloading(false); // Set loading to false when data fetching is done
+        }
+      };
+      getProblems();
+    }, [checked]); // Fetch problems whenever selected tags change
+    
   return (
     <div className='flex flex-col px-2 py-1'>
-      <h5 className='font-[500] text-[20px]'>Tags</h5>
+      <h5 className='font-[500] text-[20px] px-5'>Tags</h5>
       <div className='px-5 py-2'>
         {tags.map((tag) => (
           <div key={tag} className='flex items-center'>
@@ -71,9 +72,9 @@ const Tags: React.FC<{
               type='checkbox'
               id={tag}
               checked={checked.includes(tag)}
-              onClick={() => handleToggle(tag)}
+              onChange={() => handleToggle(tag)}
             />
-            <label htmlFor={tag} className='ml-2'>
+            <label htmlFor={tag} className='ml-2 text-[16px]'>
               {tag}
             </label>
           </div>
