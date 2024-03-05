@@ -38,16 +38,16 @@ const Home = () => {
       <div className="flex flex-col w-[40%] h-screen">
         {/* {Search Handle Component} */}
         <div className="ml-auto flex flex-row overflow-x-scroll whitespace-nowrap scrollbar-hide items-center border-[1px] border-[#333] px-2 py-1 rounded-2xl w-[60%] gap-2">
-          <div className="" onClick={handleSubmit}>
-            <ImageIcon url={magnify} wt="17px" ht="17px" />
-          </div>
           <input
             placeholder="Enter Codeforces Handle"
-            className="focus:outline-none"
+            className="focus:outline-none w-[90%]"
             value={handle}
             onChange={handleChange}
             onSubmit={handleSubmit}
           />
+          <div className="bg-[#4de6ba] rounded-[15px] p-1" onClick={handleSubmit}>
+            <ImageIcon url={magnify} wt="20px" ht="20px" />
+          </div>
         </div>
         {/* {Category Select} */}
         <div className='px-[10%]'>
